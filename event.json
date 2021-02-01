@@ -1,0 +1,9 @@
+{
+  "resource": "/",
+  "path": "/",
+  "httpMethod": "POST",
+  "headers": {},
+  "queryStringParameters": null,
+  "body": "{\"title\":\"Hello, world!\"}",
+  "isBase64Encoded": false
+}
