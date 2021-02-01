@@ -22,7 +22,7 @@ custom:
     includeModules: true # Node modules configuration for packaging
 
 functions:
-  configurator-pdf:
+  generate-pdf:
     handler: handler.pdf
     events:
       - httpApi: '*'
