@@ -4,8 +4,8 @@
   "description": "",
   "main": "handler.ts",
   "scripts": {
-    "local": "webpack && sls invoke local -f configurator-pdf -p event.json",
-    "deploy": "webpack && sls deploy"
+    "local": "sls invoke local -f configurator-pdf -p event.json",
+    "deploy": "sls deploy"
   },
   "author": "",
   "license": "ISC",
