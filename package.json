@@ -1,10 +1,10 @@
 {
-  "name": "configurator-pdf",
+  "name": "generate-pdf",
   "version": "1.0.0",
   "description": "",
   "main": "handler.ts",
   "scripts": {
-    "local": "sls invoke local -f configurator-pdf -p event.json",
+    "local": "sls invoke local -f generate-pdf -p event.json",
     "deploy": "sls deploy"
   },
   "author": "",
