@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "outDir": ".build",
+    "outDir": "./dist/",
+    "noImplicitAny": true,
     "preserveConstEnums": true,
     "strictNullChecks": true,
     "sourceMap": true,
     "allowJs": true,
+    "module": "CommonJS",
     "target": "es5",
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "lib": ["es2015"],
     "rootDir": "./",

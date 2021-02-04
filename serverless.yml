@@ -3,19 +3,22 @@ frameworkVersion: '2'
 
 plugins:
   - serverless-webpack
+  - serverless-offline
 
 provider:
   name: aws
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
   region: eu-central-1
-  stage: prod
+  stage: ${opt:stage, 'production'}
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
         - 's3:PutObject'
         - 's3:PutObjectAcl'
       Resource: 'arn:aws:s3:::my-bucket-name/*'
+  environment:
+    NODE_ENV: ${self:provider.stage}
 
 custom:
   webpack:
@@ -25,4 +28,6 @@ functions:
   generate-pdf:
     handler: handler.pdf
     events:
-      - httpApi: '*'
+      - httpApi:
+          method: POST
+          path: /

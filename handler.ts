@@ -1,11 +1,18 @@
 import { Context, Callback, APIGatewayEvent } from 'aws-lambda'
-import * as chromium from 'chrome-aws-lambda'
+import chromium from 'chrome-aws-lambda'
 import * as path from 'path'
 import * as AWS from 'aws-sdk'
-import { staticRenderPdf } from './pdf'
+import { staticRenderPdf, TemplateProps } from './pdf'
+export type InputBody = {
+  data: TemplateProps
+  fontSrc?: string[] | string // URL(s) for custom fonts
+  returnUrl?: boolean // if true, returns a S3 URL instead of PDF file. if public=false, returns a signed URL
+  public?: boolean // if true, set the PDF saved on S3 as public
+}
 
 exports.pdf = async (event: APIGatewayEvent, _context: Context, _callback: Callback) => {
-  const body = JSON.parse(event.body || '')
+  const body: InputBody = JSON.parse(event.body || '')
+  const fontSrcs = body.fontSrc ? (Array.isArray(body.fontSrc) ? body.fontSrc : [body.fontSrc]) : []
 
   const browser = await chromium.puppeteer.launch({
     args: chromium.args,
@@ -15,10 +22,11 @@ exports.pdf = async (event: APIGatewayEvent, _context: Context, _callback: Callb
   // Inject React to new page
   const page = await browser.newPage()
 
-  await page.addStyleTag({
-    url: 'https://fonts.googleapis.com/css2?family=Montserrat&display=swap',
-  })
-  await page.setContent(staticRenderPdf({ ...body }), { waitUntil: 'networkidle0' })
+  for (let i = 0; i < fontSrcs.length; i++) {
+    await page.addStyleTag({ url: fontSrcs[i] })
+  }
+
+  await page.setContent(staticRenderPdf(body.data), { waitUntil: 'networkidle0' })
 
   const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true })
   await browser.close()
@@ -33,7 +41,7 @@ exports.pdf = async (event: APIGatewayEvent, _context: Context, _callback: Callb
     s3.putObject(
       {
         Body: pdfBuffer,
-        ACL: 'public-read',
+        ACL: body.public ? 'public-read' : 'authenticated-read',
         Bucket: bucketName,
         Key: fileKey,
       },
@@ -44,10 +52,26 @@ exports.pdf = async (event: APIGatewayEvent, _context: Context, _callback: Callb
     ),
   )
 
-  const pdfUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileKey}`
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ pdfUrl }, null),
-  }
+  const pdfUrl = body.public
+    ? `https://${bucketName}.s3.${region}.amazonaws.com/${fileKey}`
+    : await s3.getSignedUrlPromise('getObject', {
+        Bucket: bucketName,
+        Key: fileKey,
+        Expires: 60 * 10, // 10 minutes
+      })
+  return body.returnUrl
+    ? {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: pdfUrl }, null),
+      }
+    : {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Length': pdfBuffer.byteLength,
+        },
+        body: pdfBuffer.toString('base64'),
+        isBase64Encoded: true,
+      }
 }
