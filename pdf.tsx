@@ -40,14 +40,7 @@ const Page: React.FC<{
           margin: '0 30px',
         }}
       />
-      <span
-        style={{
-          fontSize: '12px',
-          fontWeight: 'bold',
-        }}
-      >
-        {data.title}
-      </span>
+      <span style={{ fontSize: '12px', fontWeight: 'bold' }}>{data.title}</span>
     </div>
     <div>{children}</div>
   </div>
@@ -57,6 +50,8 @@ export const PdfTemplate: React.FC<{ data: TemplateProps }> = ({ data }) => {
   return (
     <>
       <style>{`
+      @import url(https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap);
+
       body { font-family: Montserrat; margin: 0; }
       .flex { display: flex; }
       .flex-col { flex-direction: column; }

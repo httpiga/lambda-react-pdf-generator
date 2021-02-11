@@ -1,14 +1,14 @@
 {
   "name": "generate-pdf",
   "version": "1.0.0",
-  "description": "",
+  "description": "Generate a PDF based on a React template injecting input data, upload it on S3 and return the URL",
   "main": "handler.ts",
   "scripts": {
     "dev": "NODE_ENV=dev webpack --watch",
-    "lambda:local": "sls offline --stage development --printOutput",
-    "deploy": "sls deploy"
+    "lambda:local": "IS_LOCAL=true sls offline --stage development --printOutput --noPrependStageInUrl  --printOutput",
+    "lambda:deploy": "sls deploy"
   },
-  "author": "",
+  "author": "httpiga",
   "license": "ISC",
   "dependencies": {
     "chrome-aws-lambda": "^5.5.0",

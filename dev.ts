@@ -10,7 +10,6 @@ const body: InputBody = {
     title: 'Hello, world!',
     content: 'STONKS',
   },
-  fontSrc: 'https://fonts.googleapis.com/css2?family=Montserrat',
   returnUrl: true,
   public: false,
 }
